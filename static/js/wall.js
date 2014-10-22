@@ -4,6 +4,11 @@ $(document).ready(function () {
     // function, this code only gets run when the document finishing loading.
 
     $("#message-form").submit(handleFormSubmit);
+    $("#clear-message").click(clearMessages);
+    $("#message-container").empty();
+//    getMessage();
+
+
 });
 
 
@@ -18,8 +23,8 @@ function handleFormSubmit(evt) {
 
     console.log("handleFormSubmit: ", msg);
     addMessage(msg);
-
     // Reset the message container to be empty
+
     textArea.val("");
 }
 
@@ -28,23 +33,47 @@ function handleFormSubmit(evt) {
  * Makes AJAX call to the server and the message to it.
  */
 function addMessage(msg) {
+
     $.post(
         "/api/wall/add",
         {'m': msg},
         function (data) {
             console.log("addMessage: ", data);
             displayResultStatus(data.result);
-            // $(".list-group-item").text(msg);
-
-            $("#message-container").append("<li class='list-group-item'>"+msg+"</li>");
-
-            // <li class="list-group-item">Placeholder message #1</li>
-
+            getMessage();
         }
+    
     );
 }
 
+//this will retrieve the message from the session/API and prints it out to #message-container
+function getMessage(){
+    $.get(
+        'api/wall/list',
+        function (result)
+        {
+            $("#message-container").empty();
+            for (var m in result['messages'])
+            {
+                parsed_result = result['messages'][m]['message'];
+                //console.log("parsed_result = ",parsed_result);
+                $("#message-container").prepend("<li class='list-group-item'>"+parsed_result+"</li>");
 
+            }
+
+        }
+        );
+}
+
+
+//Clears the messages from the message-container.
+function clearMessages() {
+ //       alert("in clearMessages");
+    $("#message-container").empty();
+    $.post('api/wall/clear',
+        getMessage
+        );
+}
 /**
  * This is a helper function that does nothing but show a section of the
  * site (the message result) and then hide it a moment later.

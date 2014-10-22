@@ -1,8 +1,8 @@
 import json
 
-from flask import Flask, request, render_template, make_response
+from flask import Flask, request, render_template, make_response, redirect, url_for
 
-from api import wall_list, wall_add, wall_error
+from api import wall_list, wall_add, wall_error, wall_clear
 
 
 app = Flask(__name__)
@@ -74,6 +74,11 @@ def add_message():
 
     return _convert_to_JSON(result)
 
+@app.route("/api/wall/clear", methods=['POST'])
+def clear_message():
+    """Clears messages and returns an empty list"""
+    wall_clear()
+    return redirect(url_for("index"))
 
 
 if __name__ == "__main__":
